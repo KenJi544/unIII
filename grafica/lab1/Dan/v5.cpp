@@ -21,14 +21,12 @@ double ln_1_min_x(double x, double eps){
 	/*
 	 * Not ready yet
 	 */
+	if(x < -1 || x >= 1)
+		throw "ValueError\n\t!!! -1 <= x < 1";
 	double sum = x;
-	std::cout<<"check\n";
-	if (sum > eps)
-		std::cout<<sum<<">"<<eps<<"\n";
-		for (int k=2; sum<eps; k++){
-		std::cout<<sum<<">"<<eps<<"\n";
+	if (eps > 1)
+		for (int k=2; k<eps; k++){
 			sum += power(x, k)/k;
-			std::cout<<"in func "<<std::setprecision(9)<<sum<<std::endl;
 		}
 	return sum;
 }
@@ -38,6 +36,8 @@ int main(){
 	/*
 	 * -1 <= x < 1
 	 */
-	std::cout<<"result "<<power(2, 4)<<std::endl;
-	std::cout<<"result "<<std::setprecision(9)<<ln_1_min_x(0.2, 0.0001);
+	double x, eps;
+	std::cout<<"x="; std::cin>>x;
+	std::cout<<"eps="; std::cin>>eps;
+	std::cout<<"result "<<std::setprecision(9)<<ln_1_min_x(x, eps);
 }
