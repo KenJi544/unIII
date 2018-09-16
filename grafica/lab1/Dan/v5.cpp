@@ -17,6 +17,25 @@ double power(double x, int y)
     }
 }
 
+double ln_1_min_x(double x, double eps){
+	/*
+	 * Not ready yet
+	 */
+	if (x < -1) or (x > 0)
+		throw "ValueError\n\t!!! -1<=x<1 !!!";
+	double sum = x;
+	for (int k=2; k<5; k++){
+		sum = power(x, k)/k;
+		cout<<sum<<endl;
+	}
+	return sum;
+}
+	
+
 int main(){
+	/*
+	 * -1 <= x < 1
+	 */
 	cout<<"result "<<power(2, 4)<<endl;
+	cout<<"result "<<ln_1_min_x(0.2, 0.0001)
 }
