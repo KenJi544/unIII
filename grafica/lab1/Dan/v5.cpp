@@ -1,5 +1,5 @@
 #include <iostream>
-using namespace std;
+#include <iomanip>
 
 double power(double x, int y)
 {
@@ -21,13 +21,15 @@ double ln_1_min_x(double x, double eps){
 	/*
 	 * Not ready yet
 	 */
-	if (x < -1 || x > 0)
-		throw "ValueError\n\t!!! -1<=x<1 !!!";
 	double sum = x;
-	for (int k=2; k<5; k++){
-		sum = power(x, k)/k;
-		cout<<sum<<endl;
-	}
+	std::cout<<"check\n";
+	if (sum > eps)
+		std::cout<<sum<<">"<<eps<<"\n";
+		for (int k=2; sum<eps; k++){
+		std::cout<<sum<<">"<<eps<<"\n";
+			sum += power(x, k)/k;
+			std::cout<<"in func "<<std::setprecision(9)<<sum<<std::endl;
+		}
 	return sum;
 }
 	
@@ -36,6 +38,6 @@ int main(){
 	/*
 	 * -1 <= x < 1
 	 */
-	cout<<"result "<<power(2, 4)<<endl;
-	cout<<"result "<<ln_1_min_x(0.2, 0.0001);
+	std::cout<<"result "<<power(2, 4)<<std::endl;
+	std::cout<<"result "<<std::setprecision(9)<<ln_1_min_x(0.2, 0.0001);
 }
