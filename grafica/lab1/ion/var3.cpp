@@ -28,7 +28,7 @@ float my_pow(float x, int n) {
 }
 //arcctg
 float formula(int x, int epsilon) {
-    if (x < -1 || x > 0)
+    if (x < -1 || x > 1)
 		throw "ValueError\n\t!!! -1 <= x < 1";
     float summ_result = 0;
     for (int i = 0; i < epsilon; i++) {
