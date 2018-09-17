@@ -18,9 +18,6 @@ double power(double x, int y)
 }
 
 double ln_1_min_x(double x, double eps){
-	/*
-	 * Not ready yet
-	 */
 	if(x < -1 || x >= 1)
 		throw "ValueError\n\t!!! -1 <= x < 1";
 	double sum = x;
