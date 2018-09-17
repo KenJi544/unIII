@@ -19,7 +19,6 @@ double power(double x, int y)
 
 double ln_1_min_x(double x, double eps){
 	if(x < -1 || x >= 1)
-		throw "ValueError\n\t!!! -1 <= x < 1";
 	double sum = x;
 	if (eps > 1)
 		for (int k=2; k<eps; k++){
