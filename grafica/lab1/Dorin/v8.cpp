@@ -25,8 +25,4 @@ int main(){
 	std::cout<<"x="; std::cin>>x;
 	std::cout<<"eps="; std::cin>>eps;
 	std::cout<<"result "<<std::setprecision(9)<<formula(x, eps);
-<<<<<<< HEAD
-=======
-   
->>>>>>> 2f04a4e275cc634cf2cc96b2a93c35d774096504
 }
