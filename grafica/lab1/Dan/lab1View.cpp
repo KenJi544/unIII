@@ -2,6 +2,7 @@
 // lab1View.cpp : implementation of the Clab1View class
 //
 
+
 #include "stdafx.h"
 // SHARED_HANDLERS can be defined in an ATL project implementing preview, thumbnail
 // and search filter handlers and allows sharing of document code with that project.
@@ -52,76 +53,85 @@ BOOL Clab1View::PreCreateWindow(CREATESTRUCT& cs)
 
 // Clab1View drawing
 
-void Clab1View::OnDraw(CDC* pDC)
-{
 
-	Clab1Doc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);
-	if (!pDoc)
+double ln_1_min_x(double x, double eps){
+	if (x < -1 || x >= 1){
+		
+		return 0;
+	}
+	double sum = x;
+	double t = x;
+	double k = 2;
 
-		return;
+	do{
+		
+		t *= x*(k - 1) / k++;
+	
+		sum += t;
+		
+	} while (fabs(t)>eps);
+	return sum;
+}
 
+
+
+
+	void Clab1View::OnDraw(CDC* pDC)
+	{
+		Clab1Doc* pDoc = GetDocument();
+		ASSERT_VALID(pDoc);
+		if (!pDoc)
+			return;
 
 		// TODO: add draw code for native data here
-	//	CPen pensula(PS_SOLID, 3, RGB(123, 245, 136));
-	//pDC->SelectObject(&pensula);
-	//CRect rcClient;
-	//GetClientRect(&rcClient);
-	//rcClient.CenterPoint();
 
-	//pDC->MoveTo(0, rcClient.CenterPoint().y);
-	//pDC->LineTo(rcClient.Width(), rcClient.CenterPoint().y);
-	//pDC->MoveTo(rcClient.CenterPoint().x, 0);
-	//pDC->LineTo(rcClient.CenterPoint().x, rcClient.Height());
+		double a = -6.28, b = 6.28;
+		double precizie = 0.0001;
+		int nseg = 300;
+		double step = (b - a) / nseg;
+		double scalex = 80.0;
+		double scaley = 60.0;
+		double x, y;
 
-	//CPen pensula1(PS_SOLID, 3, RGB(230, 145, 236));
-	//pDC->SelectObject(&pensula1);
-	//for (int i = 0; i < rcClient.Width(); i = i + 6){
-	//	pDC->MoveTo(i, rcClient.CenterPoint().y);
-	//	pDC->LineTo(i, rcClient.CenterPoint().y - 5);
-	//pDC->LineTo(i, rcClient.CenterPoint().y + 5);
-		//	pDC->MoveTo(rcClient.CenterPoint().x, i);
-	//pDC->LineTo(rcClient.CenterPoint().x - 5, i);
-	//pDC->LineTo(rcClient.CenterPoint().x + 5, i);
 
-		// TODO: add draw code for native data here'
-		CPen pensula(PS_SOLID, 3, RGB(123, 245, 136));
-	pDC->SelectObject(&pensula);
-	CRect rcClient;
-	GetClientRect(&rcClient);
-	rcClient.CenterPoint();
+		CPen penAxa(PS_SOLID, 2, RGB(0, 0, 255));
+		CPen penCos(PS_SOLID, 1, RGB(255, 0, 0));
+		CPen pengrad(PS_SOLID, 1, RGB(190, 190, 190));
+		CPen *pOLDPen = NULL;
+		CRect rcClient;
+		GetClientRect(&rcClient);
+		pOLDPen = pDC->SelectObject(&penAxa);
 
-	pDC->MoveTo(0, rcClient.CenterPoint().y);
-	pDC->LineTo(rcClient.Width(), rcClient.CenterPoint().y);
-	pDC->MoveTo(rcClient.CenterPoint().x, 0);
-	pDC->LineTo(rcClient.CenterPoint().x, rcClient.Height());
 
-	int centerX = rcClient.Width() / 2;
-	int centerY = rcClient.Height() / 2;
-	int interval = 8;
-	int semiInt = interval/2;
+		pDC->SelectObject(&penAxa);
+		pDC->MoveTo(0, rcClient.CenterPoint().y);
+		pDC->LineTo(rcClient.Width() - 1, rcClient.CenterPoint().y);
+		pDC->MoveTo(rcClient.CenterPoint().x, 0);
+		pDC->LineTo(rcClient.CenterPoint().x, rcClient.Height() - 1);
 
-	CPen pensula1(PS_SOLID, 3, RGB(230, 145, 236));
-	pDC->SetPixel(rcClient.CenterPoint().x, rcClient.CenterPoint().y, RGB(255, 0, 0));
-	pDC->SelectObject(&pensula1);
-	for (int i = 0; i < rcClient.Width(); i = i + interval){
-		if ((centerX - i<semiInt && centerX - i>=0) || (i - centerX<semiInt && i - centerX>=0)){}
-		else{
-			pDC->MoveTo(i, rcClient.CenterPoint().y);
-			pDC->LineTo(i, rcClient.CenterPoint().y - 5);
-			pDC->LineTo(i, rcClient.CenterPoint().y + 5);
 
+		pDC->SetTextColor(RGB(255, 0, 0));
+		pDC->SetTextAlign(TA_TOP + TA_RIGHT);
+		pDC->TextOutW(rcClient.Width() - 1, 0, L"y=myfunction(x,eps)");
+
+		step = 0.001;
+		for (x = a; x <= b; x += step){
+
+			y = log(1 - x);
+
+			pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley), RGB(255, 0, 0));
+
+
+			y = (ln_1_min_x(x,0.0000001))*-1;
+
+			pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley), RGB(0, 255, 0));
+
+			
 		}
-	}
-	for (int i = 0; i < rcClient.Height(); i = i + interval){
-		if ((centerY - i<semiInt && centerY - i>=0) || (i - centerY<semiInt && i - centerY>=0))
-			{}
-			else{
-				pDC->MoveTo(rcClient.CenterPoint().x, i);
-				pDC->LineTo(rcClient.CenterPoint().x - 5, i);
-				pDC->LineTo(rcClient.CenterPoint().x + 5, i);
-			}
-		}
+
+		pDC->SetTextColor(RGB(0, 255, 0));
+		pDC->SetTextAlign(TA_TOP + TA_LEFT);
+		pDC->TextOutW(0, 0, L"y=cos(x)");
 	}
 
 
