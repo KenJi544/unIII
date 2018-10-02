@@ -56,7 +56,7 @@ BOOL Clab1View::PreCreateWindow(CREATESTRUCT& cs)
 
 double ln_1_min_x(double x, double eps){
 	if (x < -1 || x >= 1){
-		
+
 		return 0;
 	}
 	double sum = x;
@@ -64,92 +64,91 @@ double ln_1_min_x(double x, double eps){
 	double k = 2;
 
 	do{
-		
+
 		t *= x*(k - 1) / k++;
-	
+
 		sum += t;
-		
+
 	} while (fabs(t)>eps);
-	return sum;
+	return -1*sum;
 }
 
 
 
 
-	void Clab1View::OnDraw(CDC* pDC)
+void Clab1View::OnDraw(CDC* pDC)
+{
+	Clab1Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	// TODO: add draw code for native data here
+
+	double a = -1, b = 0.98;
+	double precizie = 0.0001;
+	int nseg = 300;
+	double step = (b - a) / nseg;
+	double scalex = 320.0;
+	double scaley = 200.0;
+	double x, y;
+
+
+	CPen penAxa(PS_SOLID, 2, RGB(0, 0, 255));
+	CPen penCos(PS_SOLID, 1, RGB(255, 0, 0));
+	CPen pengrad(PS_SOLID, 1, RGB(190, 190, 190));
+	CPen *pOLDPen = NULL;
+	CRect rcClient;
+	GetClientRect(&rcClient);
+	pOLDPen = pDC->SelectObject(&penAxa);
+
+
+	pDC->SelectObject(&penAxa);
+	pDC->MoveTo(0, rcClient.CenterPoint().y);
+	pDC->LineTo(rcClient.Width() - 1, rcClient.CenterPoint().y);
+	pDC->MoveTo(rcClient.CenterPoint().x, 0);
+	pDC->LineTo(rcClient.CenterPoint().x, rcClient.Height() - 1);
+
+
+	pDC->SelectObject(&penCos);
+	x = a;
+	y = ln_1_min_x(x, precizie);
+	pDC->MoveTo(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley));
+	for (int i = 1; i <= nseg; i++)
 	{
-		Clab1Doc* pDoc = GetDocument();
-		ASSERT_VALID(pDoc);
-		if (!pDoc)
-			return;
+	x += step;
+	y = ln_1_min_x(x, precizie);
+	pDC->LineTo(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley));
+	}
+	pDC->SetTextColor(RGB(255, 0, 0));
+	pDC->SetTextAlign(TA_TOP + TA_RIGHT);
+	pDC->TextOutW(rcClient.Width() - 1, 0, L"y=ln_1_min_x(x,eps)");
 
-		// TODO: add draw code for native data here
+	step = 0.02;
+	for (x = a; x <= b; x += step){
 
-		double a = -6.28, b = 6.28;
-		double precizie = 0.0001;
-		int nseg = 300;
-		double step = (b - a) / nseg;
-		double scalex = 80.0;
-		double scaley = 60.0;
-		double x, y;
+		y = log(1 - x);
 
-
-		CPen penAxa(PS_SOLID, 2, RGB(0, 0, 255));
-		CPen penCos(PS_SOLID, 1, RGB(255, 0, 0));
-		CPen pengrad(PS_SOLID, 1, RGB(190, 190, 190));
-		CPen *pOLDPen = NULL;
-		CRect rcClient;
-		GetClientRect(&rcClient);
-		pOLDPen = pDC->SelectObject(&penAxa);
+		pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex)+5, rcClient.CenterPoint().y - (int)(y*scaley)+5, RGB(0, 255, 0));
 
 
-		pDC->SelectObject(&penAxa);
-		pDC->MoveTo(0, rcClient.CenterPoint().y);
-		pDC->LineTo(rcClient.Width() - 1, rcClient.CenterPoint().y);
-		pDC->MoveTo(rcClient.CenterPoint().x, 0);
-		pDC->LineTo(rcClient.CenterPoint().x, rcClient.Height() - 1);
+		//y = (ln_1_min_x(x, 0.0000001))*-1;
+
+		//pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex)+2, rcClient.CenterPoint().y - (int)(y*scaley)+2, RGB(0, 255, 0));
 
 
-		/*pDC->SelectObject(&penCos);
-		x = a;
-		y = myfunction(x, precizie);
-		pDC->MoveTo(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley));
-		for (int i = 1; i <= nsegm; i++)
-		{
-		x += step;
-		y = myfunction(x, precizie);
-		pDC->LineTo(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley));
-
-		}*/
-		pDC->SetTextColor(RGB(255, 0, 0));
-		pDC->SetTextAlign(TA_TOP + TA_RIGHT);
-		pDC->TextOutW(rcClient.Width() - 1, 0, L"y=myfunction(x,eps)");
-
-		step = 0.001;
-		for (x = a; x <= b; x += step){
-
-			y = log(1 - x);
-
-			pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley), RGB(255, 0, 0));
-
-
-			y = (ln_1_min_x(x,0.0000001))*-1;
-
-			pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley), RGB(0, 255, 0));
-
-			
-		}
-
-		pDC->SetTextColor(RGB(0, 255, 0));
-		pDC->SetTextAlign(TA_TOP + TA_LEFT);
-		pDC->TextOutW(0, 0, L"y=cos(x)");
 	}
 
+	pDC->SetTextColor(RGB(0, 255, 0));
+	pDC->SetTextAlign(TA_TOP + TA_LEFT);
+	pDC->TextOutW(0, 0, L"y=ln(1-x)");
+}
 
 
-		
 
-	// TODO: add draw code for native data her
+
+
+// TODO: add draw code for native data her
 
 
 // Clab1View printing
