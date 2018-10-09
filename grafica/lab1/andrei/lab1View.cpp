@@ -12,6 +12,9 @@
 
 #include "lab1Doc.h"
 #include "lab1View.h"
+#include <iostream>
+#include <fstream>
+using namespace std;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -82,35 +85,39 @@ void Clab1View::OnDraw(CDC* pDC)
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
+	ofstream myfile;
+	myfile.open("fisier1.txt");
+	ofstream myfile2;
+	myfile2.open("fisier2.txt");
 
 	// TODO: add draw code for native data here
 
-	double a = -1, b = 0.98;
-	double precizie = 0.0001;
+	double a = -1, b = 0.98;//punem limitele
+	double precizie = 0.0001;//plasam precizia
 	int nseg = 300;
-	double step = (b - a) / nseg;
-	double scalex = 320.0;
+	double step = (b - a) / nseg;//marimea pasului
+	double scalex = 320.0;//marimea axelor
 	double scaley = 200.0;
 	double x, y;
+	double diff;
 
 
-	CPen penAxa(PS_SOLID, 2, RGB(0, 0, 255));
-	CPen penCos(PS_SOLID, 1, RGB(255, 0, 0));
-	CPen pengrad(PS_SOLID, 1, RGB(190, 190, 190));
+	CPen penAxa(PS_SOLID, 2, RGB(0, 0, 255));// intializam creioanele a axei si a funtiei
+	CPen penFun(PS_SOLID, 1, RGB(255, 0, 0));
 	CPen *pOLDPen = NULL;
 	CRect rcClient;
-	GetClientRect(&rcClient);
+	GetClientRect(&rcClient);// aflam centrul 
 	pOLDPen = pDC->SelectObject(&penAxa);
 
 
-	pDC->SelectObject(&penAxa);
+	pDC->SelectObject(&penAxa);//desenam axa
 	pDC->MoveTo(0, rcClient.CenterPoint().y);
 	pDC->LineTo(rcClient.Width() - 1, rcClient.CenterPoint().y);
 	pDC->MoveTo(rcClient.CenterPoint().x, 0);
 	pDC->LineTo(rcClient.CenterPoint().x, rcClient.Height() - 1);
 
 
-	pDC->SelectObject(&penCos);
+	pDC->SelectObject(&penFun);//schimbam pixul si desenam functia proprie cu lin
 	x = a;
 	y = ln_1_min_x(x, precizie);
 	pDC->MoveTo(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley));
@@ -118,6 +125,12 @@ void Clab1View::OnDraw(CDC* pDC)
 	{
 	x += step;
 	y = ln_1_min_x(x, precizie);
+	diff = log(1 - x) ;
+	myfile2 <<   x << " \t"<< y << "\n";
+	myfile << " functia proprie x=" << x << " y=" << y << " ";
+	myfile << " functia bibliotecii x=" << x << " y=" << log(1 - x) << " ";
+	myfile << " valoarea absoluta a lui y "  << diff-y << " \n";
+
 	pDC->LineTo(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley));
 	}
 	pDC->SetTextColor(RGB(255, 0, 0));
@@ -132,16 +145,17 @@ void Clab1View::OnDraw(CDC* pDC)
 		pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex)+5, rcClient.CenterPoint().y - (int)(y*scaley)+5, RGB(0, 255, 0));
 
 
-		//y = (ln_1_min_x(x, 0.0000001))*-1;
-
-		//pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex)+2, rcClient.CenterPoint().y - (int)(y*scaley)+2, RGB(0, 255, 0));
-
-
+		
+		
+		
+		
 	}
 
 	pDC->SetTextColor(RGB(0, 255, 0));
 	pDC->SetTextAlign(TA_TOP + TA_LEFT);
 	pDC->TextOutW(0, 0, L"y=ln(1-x)");
+	myfile.close();
+	myfile2.close();
 }
 
 
