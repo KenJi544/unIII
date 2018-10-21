@@ -2,7 +2,6 @@
 // lab1View.cpp : implementation of the Clab1View class
 //
 
-#include <math.h>       /* exp */
 
 #include "stdafx.h"
 // SHARED_HANDLERS can be defined in an ATL project implementing preview, thumbnail
@@ -13,6 +12,9 @@
 
 #include "lab1Doc.h"
 #include "lab1View.h"
+#include <iostream>
+#include <fstream>
+using namespace std;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -55,12 +57,12 @@ BOOL Clab1View::PreCreateWindow(CREATESTRUCT& cs)
 // Clab1View drawing
 
 
-double formula(double x, double eps){
+double ln_1_min_x(double x, double eps) {
 	double sum = x + 1;
 	double t = x;
 	double k = 2;
 
-	do{
+	do {
 		t *= x / k++;
 
 		sum += t;
@@ -71,80 +73,90 @@ double formula(double x, double eps){
 
 
 
-	void Clab1View::OnDraw(CDC* pDC)
+void Clab1View::OnDraw(CDC* pDC)
+{
+	Clab1Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+	ofstream myfile;
+	myfile.open("fisier1.txt");
+	ofstream myfile2;
+	myfile2.open("fisier2.txt");
+
+	// TODO: add draw code for native data here
+
+	double a = -1, b = 0.98;//punem limitele
+	double precizie = 0.0001;//plasam precizia
+	int nseg = 300;
+	double step = (b - a) / nseg;//marimea pasului
+	double scalex = 320.0;//marimea axelor
+	double scaley = 200.0;
+	double x, y;
+	double diff;
+
+
+	CPen penAxa(PS_SOLID, 2, RGB(0, 0, 255));// intializam creioanele a axei si a funtiei
+	CPen penFun(PS_SOLID, 1, RGB(255, 0, 0));
+	CPen *pOLDPen = NULL;
+	CRect rcClient;
+	GetClientRect(&rcClient);// aflam centrul 
+	pOLDPen = pDC->SelectObject(&penAxa);
+
+
+	pDC->SelectObject(&penAxa);//desenam axa
+	pDC->MoveTo(0, rcClient.CenterPoint().y);
+	pDC->LineTo(rcClient.Width() - 1, rcClient.CenterPoint().y);
+	pDC->MoveTo(rcClient.CenterPoint().x, 0);
+	pDC->LineTo(rcClient.CenterPoint().x, rcClient.Height() - 1);
+
+
+	pDC->SelectObject(&penFun);//schimbam pixul si desenam functia proprie cu lin
+	x = a;
+	y = ln_1_min_x(x, precizie);
+	pDC->MoveTo(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley));
+	for (int i = 1; i <= nseg; i++)
 	{
-		Clab1Doc* pDoc = GetDocument();
-		ASSERT_VALID(pDoc);
-		if (!pDoc)
-			return;
-
-		// TODO: add draw code for native data here
-
-		double a = -6.28, b = 6.28;
-		double precizie = 0.0001;
-		int nseg = 300;
-		double step = (b - a) / nseg;
-		double scalex = 80.0;
-		double scaley = 60.0;
-		double x, y;
-
-
-		CPen penAxa(PS_SOLID, 2, RGB(0, 0, 255));
-		CPen penCos(PS_SOLID, 1, RGB(255, 0, 0));
-		CPen pengrad(PS_SOLID, 1, RGB(190, 190, 190));
-		CPen *pOLDPen = NULL;
-		CRect rcClient;
-		GetClientRect(&rcClient);
-		pOLDPen = pDC->SelectObject(&penAxa);
-
-
-		pDC->SelectObject(&penAxa);
-		pDC->MoveTo(0, rcClient.CenterPoint().y);
-		pDC->LineTo(rcClient.Width() - 1, rcClient.CenterPoint().y);
-		pDC->MoveTo(rcClient.CenterPoint().x, 0);
-		pDC->LineTo(rcClient.CenterPoint().x, rcClient.Height() - 1);
-
-
-		/*pDC->SelectObject(&penCos);
-		x = a;
-		y = myfunction(x, precizie);
-		pDC->MoveTo(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley));
-		for (int i = 1; i <= nsegm; i++)
-		{
 		x += step;
-		y = myfunction(x, precizie);
+		y = ln_1_min_x(x, precizie);
+		diff = log(1 - x);
+		myfile2 << x << " \t" << y << "\n";
+		myfile << " functia proprie x=" << x << " y=" << y << " ";
+		myfile << " functia bibliotecii x=" << x << " y=" << log(1 - x) << " ";
+		myfile << " valoarea absoluta a lui y " << diff - y << " \n";
+
 		pDC->LineTo(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley));
+	}
+	pDC->SetTextColor(RGB(255, 0, 0));
+	pDC->SetTextAlign(TA_TOP + TA_RIGHT);
+	pDC->TextOutW(rcClient.Width() - 1, 0, L"y=ln_1_min_x(x,eps)");
 
-		}*/
-		pDC->SetTextColor(RGB(255, 0, 0));
-		pDC->SetTextAlign(TA_TOP + TA_RIGHT);
-		pDC->TextOutW(rcClient.Width() - 1, 0, L"y=myfunction(x,eps)");
+	step = 0.02;
+	for (x = a; x <= b; x += step) {
 
-		step = 0.001;
-		for (x = a; x <= b; x += step){
+		y = log(1 - x);
 
-			y = exp(x);
-
-			pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley), RGB(255, 0, 0));
+		pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex) + 5, rcClient.CenterPoint().y - (int)(y*scaley) + 5, RGB(0, 255, 0));
 
 
-			y = formula(x, 0.0000001);
 
-			pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley), RGB(0, 255, 0));
 
-			
-		}
 
-		pDC->SetTextColor(RGB(0, 255, 0));
-		pDC->SetTextAlign(TA_TOP + TA_LEFT);
-		pDC->TextOutW(0, 0, L"y=cos(x)");
+
 	}
 
+	pDC->SetTextColor(RGB(0, 255, 0));
+	pDC->SetTextAlign(TA_TOP + TA_LEFT);
+	pDC->TextOutW(0, 0, L"y=ln(1-x)");
+	myfile.close();
+	myfile2.close();
+}
 
 
-		
 
-	// TODO: add draw code for native data her
+
+
+// TODO: add draw code for native data her
 
 
 // Clab1View printing
