@@ -1,4 +1,5 @@
 
+
 // lab1View.cpp : implementation of the Clab1View class
 //
 
@@ -56,16 +57,16 @@ BOOL Clab1View::PreCreateWindow(CREATESTRUCT& cs)
 
 // Clab1View drawing
 
-
-double ln_1_min_x(double x, double eps) {
+double formula(double x, double eps){
 	double sum = x + 1;
 	double t = x;
 	double k = 2;
 
-	do {
+	do{
 		t *= x / k++;
 
 		sum += t;
+		std::cout << sum << "\n";
 	} while (fabs(t)>eps);
 	return sum;
 }
@@ -86,7 +87,7 @@ void Clab1View::OnDraw(CDC* pDC)
 
 	// TODO: add draw code for native data here
 
-	double a = -1, b = 0.98;//punem limitele
+	double a = -4, b = 0.98;//punem limitele
 	double precizie = 0.0001;//plasam precizia
 	int nseg = 300;
 	double step = (b - a) / nseg;//marimea pasului
@@ -113,41 +114,41 @@ void Clab1View::OnDraw(CDC* pDC)
 
 	pDC->SelectObject(&penFun);//schimbam pixul si desenam functia proprie cu lin
 	x = a;
-	y = ln_1_min_x(x, precizie);
+	y = formula(x, precizie);
 	pDC->MoveTo(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley));
 	for (int i = 1; i <= nseg; i++)
 	{
-		x += step;
-		y = ln_1_min_x(x, precizie);
-		diff = log(1 - x);
-		myfile2 << x << " \t" << y << "\n";
-		myfile << " functia proprie x=" << x << " y=" << y << " ";
-		myfile << " functia bibliotecii x=" << x << " y=" << log(1 - x) << " ";
-		myfile << " valoarea absoluta a lui y " << diff - y << " \n";
+	x += step;
+	y = formula(x, precizie);
+	diff = exp(x) ;
+	myfile2 <<   x << " \t"<< y << "\n";//tabulare
+	myfile << " functia proprie x=" << x << " y=" << y << " ";
+	myfile << " functia bibliotecii x=" << x << " y=" << exp(x) << " ";
+	myfile << " valoarea absoluta a lui y "  << diff-y << " \n";
 
-		pDC->LineTo(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley));
+	pDC->LineTo(rcClient.CenterPoint().x + (int)(x*scalex), rcClient.CenterPoint().y - (int)(y*scaley));
 	}
 	pDC->SetTextColor(RGB(255, 0, 0));
 	pDC->SetTextAlign(TA_TOP + TA_RIGHT);
-	pDC->TextOutW(rcClient.Width() - 1, 0, L"y=ln_1_min_x(x,eps)");
+	pDC->TextOutW(rcClient.Width() - 1, 0, L"y=formula(x,eps)");
 
 	step = 0.02;
-	for (x = a; x <= b; x += step) {
+	for (x = a; x <= b; x += step){
 
-		y = log(1 - x);
+		y = exp(x);
 
-		pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex) + 5, rcClient.CenterPoint().y - (int)(y*scaley) + 5, RGB(0, 255, 0));
-
-
+		pDC->SetPixel(rcClient.CenterPoint().x + (int)(x*scalex)+5, rcClient.CenterPoint().y - (int)(y*scaley)+5, RGB(0, 255, 0));
 
 
-
-
+		
+		
+		
+		
 	}
 
 	pDC->SetTextColor(RGB(0, 255, 0));
 	pDC->SetTextAlign(TA_TOP + TA_LEFT);
-	pDC->TextOutW(0, 0, L"y=ln(1-x)");
+	pDC->TextOutW(0, 0, L"y=exp(1-x)");
 	myfile.close();
 	myfile2.close();
 }
